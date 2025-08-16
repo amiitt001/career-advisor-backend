@@ -29,4 +29,31 @@ router.post('/', async (req, res) => {
   }
 });
 
+module.exports = router;// ... your existing router.post(...) code should be above this
+
+// This route handles updating a profile with new information, like a score
+router.patch('/:uid', async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const dataToUpdate = req.body; // This will be an object like { assessmentScore: 80 }
+
+    if (!uid) {
+      return res.status(400).json({ error: 'UID is missing.' });
+    }
+
+    // .update() merges data into an existing document without overwriting the whole thing
+    await db.collection('profiles').doc(uid).update(dataToUpdate);
+
+    res.status(200).json({ 
+      message: 'Profile updated successfully!', 
+      uid: uid,
+      updatedData: dataToUpdate 
+    });
+
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: 'Failed to update profile.' });
+  }
+});
+
 module.exports = router;

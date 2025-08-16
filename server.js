@@ -5,6 +5,8 @@ const db = require('./database.js');
 
 // --- 1. DEFINE ROUTES ---
 const profileRoutes = require('./routes/profile.js');
+const resumeRoutes = require('./routes/resume.js');
+const recommendationRoutes = require('./routes/recommendations.js');
 
 dotenv.config();
 
@@ -17,6 +19,8 @@ app.use(express.json());
 
 // --- 4. USE ROUTES ---
 app.use('/profile', profileRoutes);
+app.use('/resume', resumeRoutes);
+app.use('/recommendations', recommendationRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -19,11 +19,14 @@
   "homepage": "https://github.com/amiitt001/career-advisor-backend#readme",
   "description": "",
   "dependencies": {
+    "@google-cloud/storage": "^7.16.0",
+    "@google-cloud/vertexai": "^1.10.0",
     "@google/generative-ai": "^0.24.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "firebase-admin": "^13.4.0"
+    "firebase-admin": "^13.4.0",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
