@@ -16,6 +16,8 @@ const app = express();
 // --- 3. USE MIDDLEWARE ---
 app.use(cors());
 app.use(express.json());
+const requestLogger = require('./middlewares/requestLogger.js');
+app.use(requestLogger);
 
 // --- 4. USE ROUTES ---
 app.use('/profile', profileRoutes);
