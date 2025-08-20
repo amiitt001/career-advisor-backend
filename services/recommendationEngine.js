@@ -37,6 +37,7 @@ async function getCareerRecommendations(userProfile) {
     - "required_skills": An array of strings listing the key technical and soft skills required for this role in the Indian job market.
     - "skill_gaps": An array of strings listing the skills from "required_skills" that the student appears to be missing from their profile.
     - "learning_path": A short string (2-3 sentences) suggesting a starting point for the student to bridge their skill gaps, like specific types of online courses, projects, or certifications.
+    - "jobSearchUrl": A string that is a valid Google search URL for finding jobs for the given "title" in India. The URL should be in the format 'https://www.google.com/search?q=...&ibp=htl;jobs'.
   `;
 
   console.log("Sending prompt to Gemini AI...");
