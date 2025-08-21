@@ -1,5 +1,6 @@
 const db = require('../database.js');
 const { getCareerRecommendations } = require('../services/recommendationEngine.js');
+const { getCareerRecommendations, compareCareerPaths } = require('../services/recommendationEngine.js');
 
 const generateRecommendations = async (req, res) => {
   try {
@@ -30,7 +31,22 @@ const generateRecommendations = async (req, res) => {
     res.status(500).json({ error: 'Failed to get recommendations.' });
   }
 };
+const compareCareers = async (req, res) => {
+  try {
+    const { career1, career2 } = req.body;
+    if (!career1 || !career2) {
+      return res.status(400).json({ error: 'Two career paths are required for comparison.' });
+    }
+    const comparison = await compareCareerPaths(career1, career2);
+    res.status(200).json({ comparisonText: comparison });
+  } catch (error) {
+    console.error("Error comparing careers:", error);
+    res.status(500).json({ error: 'Failed to compare careers.' });
+  }
+};
+
 
 module.exports = {
-  generateRecommendations,
+   generateRecommendations,
+  compareCareers,
 };

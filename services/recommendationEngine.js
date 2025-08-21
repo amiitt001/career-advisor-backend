@@ -52,5 +52,34 @@ async function getCareerRecommendations(userProfile) {
   console.log("Received AI response.");
   return JSON.parse(jsonResponse);
 }
+// Add this new function
+async function compareCareerPaths(career1, career2) {
+  const stringifiedCareers = JSON.stringify({ career1, career2 }, null, 2);
 
-module.exports = { getCareerRecommendations };
+  const prompt = `
+    You are an expert career counselor in India. Your task is to provide a detailed, side-by-side comparison of the two following career paths for a student.
+
+    Career Paths to Compare:
+    ${stringifiedCareers}
+
+    Generate a comparison that is easy to read. Your response MUST be a single string formatted with Markdown. Do not use a JSON response. 
+    The comparison should include, but is not limited to:
+    - A brief overview of each role.
+    - Differences in day-to-day responsibilities.
+    - A comparison of the core skills required.
+    - An estimate of the average starting salary range in India.
+    - The long-term career growth prospects for each path.
+
+    Structure your response clearly with headings.
+  `;
+
+  console.log("Sending comparison prompt to Gemini AI...");
+  const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
+  const resp = await generativeModel.generateContent(request);
+
+  const comparisonText = resp.response.candidates[0].content.parts[0].text;
+  console.log("Received AI comparison.");
+  return comparisonText;
+}
+
+module.exports = {  getCareerRecommendations, compareCareerPaths };
