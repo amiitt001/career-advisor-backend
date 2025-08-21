@@ -4,11 +4,23 @@ This is the backend server for the AI-powered Career and Skills Advisor applicat
 
 ## ✨ Key Features
 
-- **User Profile Management:** Create and update user profiles, stored securely in Google Firestore.
-- **Resume Processing:** Uploads PDF resumes to Google Cloud Storage and parses them to extract key skills.
-- **Skills Assessment:** Stores and retrieves scores from a skills-based quiz.
-- **AI Recommendation Engine:** Communicates with Google's Gemini model via Vertex AI to generate tailored career advice based on a user's complete profile.
+### Future Scope
 
+This project has significant potential for expansion into a full-fledged career development platform. Future enhancements include:
+
+- **Full User Authentication:** Implement a complete login/signup system to allow multiple users to save and manage their profiles securely.
+
+- **AI Project Generator:** A unique feature where the AI suggests personalized portfolio projects based on a user's recommended career and personal interests, helping them build practical experience. 
+ 
+- **AI Resume Co-Pilot:** Go beyond skill extraction and use generative AI to help users transform simple descriptions of their experiences into professional, impactful bullet points for their resume.
+
+- **AI-Powered Interview Prep:** A tool to generate common interview questions for a recommended career path and provide coaching on how to best answer them based on the user's specific skill set.
+
+- **Career Comparison Tool:** Allow users to select two recommended careers and receive a detailed, AI-generated comparison of day-to-day responsibilities, salary expectations in India, and long-term growth prospects.
+ 
+- **Hyper-Localized Learning:** Enhance the learning path suggestions to include resources from Indian educational initiatives (like NPTEL) and tutorials available in regional languages.
+
+- **User Feedback Loop:** Allow users to rate their recommendations, providing valuable data to further fine-tune the AI prompts and improve results over time.
 ## 🌟 Vision & Social Impact
 
 Our vision is to empower every student in India with the clarity and confidence to choose a fulfilling career path. By leveraging the power of generative AI, this platform democratizes access to high-quality, personalized career counseling, helping to bridge the gap between education and employment and enabling the next generation to realize their full potential.
