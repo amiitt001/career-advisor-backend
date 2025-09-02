@@ -2,11 +2,11 @@ const { VertexAI } = require('@google-cloud/vertexai');
 
 // Initialize Vertex AI
 const vertex_ai = new VertexAI({
-  project: 'career-and-skills-advisor-34d4ba44778f', // Use your actual project ID
+  project: 'career-and-skills-advisor', // Use your actual project ID
   location: 'asia-south1',
 });
 
-const model = 'gemini-1.5-flash-001'; // Use a powerful and fast model
+const model = 'gemini-1.5-pro'; // Use a powerful and fast model
 
 // Configure the generative model
 const generativeModel = vertex_ai.getGenerativeModel({
