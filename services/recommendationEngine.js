@@ -23,22 +23,22 @@ async function getCareerRecommendations(userProfile) {
 
   // This is the prompt that instructs the AI. It's the most important part!
   const prompt = `
-    You are an expert career and skills advisor for students in India. 
-    Your task is to analyze the following student profile and provide 3 personalized, actionable career path recommendations.
+  You are an expert career and skills advisor for students in India. 
+  Your task is to analyze the following student profile and provide 3 personalized, actionable career path recommendations.
 
-    Student Profile:
-    ${stringifiedProfile}
+  Student Profile:
+  ${stringifiedProfile}
 
-    Based on this profile, generate 3 distinct career recommendations. For each recommendation, consider the student's interests and skills (both self-declared and those extracted from their resume).
-
-    Your response MUST be a valid JSON array of objects. Do not include any text, notes, or markdown formatting like \`\`\`json before or after the JSON array. The array should contain exactly 3 objects. Each object must have the following exact keys:
-    - "title": A string for the career path title (e.g., "AI/ML Engineer").
-    - "reason": A string (2-3 sentences) explaining why this path is a great fit for the student, referencing their specific interests and skills.
-    - "required_skills": An array of strings listing the key technical and soft skills required for this role in the Indian job market.
-    - "skill_gaps": An array of strings listing the skills from "required_skills" that the student appears to be missing from their profile.
-    - "learning_path": A short string (2-3 sentences) suggesting a starting point for the student to bridge their skill gaps, like specific types of online courses, projects, or certifications.
-    - "jobSearchUrl": A string that is a valid Google search URL for finding jobs for the given "title" in India. The URL should be in the format 'https://www.google.com/search?q=...&ibp=htl;jobs'.
-  `;
+  Based on this profile, generate 3 distinct career recommendations. Your response MUST be a valid JSON array of objects. Do not include any text or markdown formatting like \`\`\`json before or after the array. Each object in the array must have the following exact keys:
+  - "title": A string for the career path title (e.g., "AI/ML Engineer").
+  - "overview": A string (1-2 sentences) providing a brief, engaging overview of the role.
+  - "whyGoodFit": A string (2-3 sentences) explaining why this path is a great fit, referencing the student's specific interests and skills.
+  - "keySkillsRequired": An array of strings listing the most important technical and soft skills for this role.
+  - "skillGapsForUser": An array of strings listing the skills from "keySkillsRequired" that the student appears to be missing.
+  - "howToGetStarted": An array of strings with 2-3 actionable first steps for the student.
+  - "averageSalaryIndiaLPA": A string estimating the average starting salary in India (e.g., "5-8 Lakhs p.a.").
+  - "dayInTheLifeSummary": A string (2-3 sentences) giving a brief summary of the daily tasks and responsibilities.
+`;
 
   console.log("Sending prompt to Gemini AI...");
   const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
@@ -56,23 +56,20 @@ async function getCareerRecommendations(userProfile) {
 async function compareCareerPaths(career1, career2) {
   const stringifiedCareers = JSON.stringify({ career1, career2 }, null, 2);
 
-  const prompt = `
-    You are an expert career counselor in India. Your task is to provide a detailed, side-by-side comparison of the two following career paths for a student.
+const prompt = `
+  You are an expert career counselor in India. Your task is to provide a detailed, side-by-side comparison of the two following career paths for a student.
 
-    Career Paths to Compare:
-    ${stringifiedCareers}
+  Career Paths to Compare:
+  ${stringifiedCareers}
 
-    Generate a comparison that is easy to read. Your response MUST be a single string formatted with Markdown. Do not use a JSON response. 
-    The comparison should include, but is not limited to:
-    - A brief overview of each role.
-    - Differences in day-to-day responsibilities.
-    - A comparison of the core skills required.
-    - An estimate of the average starting salary range in India.
-    - The long-term career growth prospects for each path.
-
-    Structure your response clearly with headings.
-  `;
-
+  Your response MUST be a single, valid JSON object. Do not include any text, notes, or markdown formatting before or after the JSON. The object must have the following exact keys:
+  - "career1_title": A string for the first career path title.
+  - "career2_title": A string for the second career path title.
+  - "comparisonPoints": An array of objects, where each object has these three keys:
+    - "metric": A string for the comparison point (e.g., "Day-to-Day Responsibilities", "Average Starting Salary (India)", "Core Skills").
+    - "career1_details": A string describing the details for the first career.
+    - "career2_details": A string describing the details for the second career.
+`;
   console.log("Sending comparison prompt to Gemini AI...");
   const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
   const resp = await generativeModel.generateContent(request);

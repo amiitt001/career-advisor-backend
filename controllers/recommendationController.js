@@ -14,6 +14,11 @@ const generateRecommendations = async (req, res) => {
       return res.status(404).json({ error: 'Profile not found.' });
     }
     const userProfile = profileDoc.data();
+// --- ADD THESE LINES FOR DEBUGGING ---
+console.log("--- PROFILE DATA BEING SENT TO AI ---");
+console.log(userProfile);
+console.log("-----------------------------------");
+// ...
     const recommendations = await getCareerRecommendations(userProfile);
     await db.collection('recommendations').doc(uid).set({
       recommendations: recommendations,
@@ -32,8 +37,9 @@ const compareCareers = async (req, res) => {
     if (!career1 || !career2) {
       return res.status(400).json({ error: 'Two career paths are required for comparison.' });
     }
-    const comparison = await compareCareerPaths(career1, career2);
-    res.status(200).json({ comparisonText: comparison });
+    // The service now returns a parsed JSON object directly
+    const comparisonData = await compareCareerPaths(career1, career2);
+    res.status(200).json(comparisonData);
   } catch (error) {
     console.error("Error comparing careers:", error);
     res.status(500).json({ error: 'Failed to compare careers.' });
