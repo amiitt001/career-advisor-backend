@@ -1,82 +1,90 @@
 const { VertexAI } = require('@google-cloud/vertexai');
 
-// Initialize Vertex AI
+// Initialize Vertex AI - Make sure this is your active project ID and location
 const vertex_ai = new VertexAI({
-  project: 'career-and-skills-advisor', // Use your actual project ID
+  project: 'byte-busters-career-advisor', // Use your active project ID
   location: 'asia-south1',
 });
 
-const model = 'gemini-1.5-pro'; // Use a powerful and fast model
+const model = 'gemini-1.0-pro'; // The stable model we know works
 
-// Configure the generative model
-const generativeModel = vertex_ai.getGenerativeModel({
-  model: model,
-  generationConfig: {
-    maxOutputTokens: 8192,
-    temperature: 0.3, // Lower temperature for more predictable, structured output
-    topP: 0.95,
-  },
-});
+const generativeModel = vertex_ai.getGenerativeModel({ model: model });
 
 async function getCareerRecommendations(userProfile) {
   const stringifiedProfile = JSON.stringify(userProfile, null, 2);
-
-  // This is the prompt that instructs the AI. It's the most important part!
   const prompt = `
-  You are an expert career and skills advisor for students in India. 
-  Your task is to analyze the following student profile and provide 3 personalized, actionable career path recommendations.
-
-  Student Profile:
-  ${stringifiedProfile}
-
-  Based on this profile, generate 3 distinct career recommendations. Your response MUST be a valid JSON array of objects. Do not include any text or markdown formatting like \`\`\`json before or after the array. Each object in the array must have the following exact keys:
-  - "title": A string for the career path title (e.g., "AI/ML Engineer").
-  - "overview": A string (1-2 sentences) providing a brief, engaging overview of the role.
-  - "whyGoodFit": A string (2-3 sentences) explaining why this path is a great fit, referencing the student's specific interests and skills.
-  - "keySkillsRequired": An array of strings listing the most important technical and soft skills for this role.
-  - "skillGapsForUser": An array of strings listing the skills from "keySkillsRequired" that the student appears to be missing.
-  - "howToGetStarted": An array of strings with 2-3 actionable first steps for the student.
-  - "averageSalaryIndiaLPA": A string estimating the average starting salary in India (e.g., "5-8 Lakhs p.a.").
-  - "dayInTheLifeSummary": A string (2-3 sentences) giving a brief summary of the daily tasks and responsibilities.
-`;
-
-  console.log("Sending prompt to Gemini AI...");
+    You are an expert career and skills advisor for students in India. 
+    Your task is to analyze the following student profile and provide 3 personalized, actionable career path recommendations.
+    Student Profile:
+    ${stringifiedProfile}
+    Your response MUST be a valid JSON array of objects. Do not include any text or markdown formatting. Each object must have these exact keys: "title", "overview", "whyGoodFit", "keySkillsRequired", "skillGapsForUser", "howToGetStarted", "averageSalaryIndiaLPA", "dayInTheLifeSummary".
+  `;
+  console.log("Sending prompt to Gemini AI for recommendations...");
   const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
   const resp = await generativeModel.generateContent(request);
-
-  // Extract and clean the JSON response from the AI
-  const jsonResponse = resp.response.candidates[0].content.parts[0].text
-    .replace(/```json/g, '')
-    .replace(/```/g, '');
-
+  const jsonResponse = resp.response.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '');
   console.log("Received AI response.");
   return JSON.parse(jsonResponse);
 }
-// Add this new function
+
 async function compareCareerPaths(career1, career2) {
   const stringifiedCareers = JSON.stringify({ career1, career2 }, null, 2);
-
-const prompt = `
-  You are an expert career counselor in India. Your task is to provide a detailed, side-by-side comparison of the two following career paths for a student.
-
-  Career Paths to Compare:
-  ${stringifiedCareers}
-
-  Your response MUST be a single, valid JSON object. Do not include any text, notes, or markdown formatting before or after the JSON. The object must have the following exact keys:
-  - "career1_title": A string for the first career path title.
-  - "career2_title": A string for the second career path title.
-  - "comparisonPoints": An array of objects, where each object has these three keys:
-    - "metric": A string for the comparison point (e.g., "Day-to-Day Responsibilities", "Average Starting Salary (India)", "Core Skills").
-    - "career1_details": A string describing the details for the first career.
-    - "career2_details": A string describing the details for the second career.
-`;
+  const prompt = `
+    You are an expert career counselor in India. Your task is to provide a detailed, side-by-side comparison of two career paths.
+    Your response MUST be a single, valid JSON object with these keys: "career1_title", "career2_title", "comparisonPoints" (which is an array of objects with keys "metric", "career1_details", "career2_details").
+  `;
   console.log("Sending comparison prompt to Gemini AI...");
   const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
   const resp = await generativeModel.generateContent(request);
-
-  const comparisonText = resp.response.candidates[0].content.parts[0].text;
+  const jsonResponse = resp.response.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '');
   console.log("Received AI comparison.");
-  return comparisonText;
+  return JSON.parse(jsonResponse);
 }
 
-module.exports = {  getCareerRecommendations, compareCareerPaths };
+async function generateProjectIdea(careerRecommendation, userInterests) {
+  const prompt = `
+    You are an expert tech mentor. Generate a single, specific portfolio project idea for a student recommended for the career of "${careerRecommendation.title}" with interests in "${userInterests.join(', ')}".
+    Your response MUST be a single, valid JSON object with these keys: "projectTitle", "projectDescription", "technologiesToUse", "learningOutcomes".
+  `;
+  console.log("Sending project generation prompt to Gemini AI...");
+  const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
+  const resp = await generativeModel.generateContent(request);
+  const jsonResponse = resp.response.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '');
+  console.log("Received AI project idea.");
+  return JSON.parse(jsonResponse);
+}
+
+async function generateQuiz(careerTitle) {
+  const prompt = `
+    You are a technical assessor. Create a 5-question multiple-choice quiz for a junior-level "${careerTitle}".
+    Your response MUST be a valid JSON array of objects, where each object has these keys: "question", "options" (an array of 4), and "correctAnswer".
+  `;
+  console.log(`Sending quiz generation prompt for: ${careerTitle}`);
+  const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
+  const resp = await generativeModel.generateContent(request);
+  const jsonResponse = resp.response.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '');
+  console.log("Received AI-generated quiz.");
+  return JSON.parse(jsonResponse);
+}
+
+async function suggestQuizTopic(userProfile) {
+  const stringifiedProfile = JSON.stringify({ interests: userProfile.interests, skills: userProfile.skills });
+  const prompt = `
+    Based on this user profile: ${stringifiedProfile}. Suggest a single, specific job title for a skills quiz.
+    Your response MUST be only the job title string and nothing else.
+  `;
+  console.log("Sending prompt to suggest a quiz topic...");
+  const request = { contents: [{ role: 'user', parts: [{ text: prompt }] }] };
+  const resp = await generativeModel.generateContent(request);
+  const topic = resp.response.candidates[0].content.parts[0].text.trim();
+  console.log(`Received AI quiz topic suggestion: ${topic}`);
+  return topic;
+}
+
+module.exports = { 
+  getCareerRecommendations, 
+  compareCareerPaths, 
+  generateProjectIdea, 
+  generateQuiz,
+  suggestQuizTopic 
+};

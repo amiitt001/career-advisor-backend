@@ -1,9 +1,10 @@
 const db = require('../database.js');
-// ONE single import for all functions from the recommendation engine
 const { 
   getCareerRecommendations, 
   compareCareerPaths, 
-  generateProjectIdea 
+  generateProjectIdea,
+  generateQuiz,
+  suggestQuizTopic 
 } = require('../services/recommendationEngine.js');
 
 const generateRecommendations = async (req, res) => {
@@ -14,11 +15,6 @@ const generateRecommendations = async (req, res) => {
       return res.status(404).json({ error: 'Profile not found.' });
     }
     const userProfile = profileDoc.data();
-// --- ADD THESE LINES FOR DEBUGGING ---
-console.log("--- PROFILE DATA BEING SENT TO AI ---");
-console.log(userProfile);
-console.log("-----------------------------------");
-// ...
     const recommendations = await getCareerRecommendations(userProfile);
     await db.collection('recommendations').doc(uid).set({
       recommendations: recommendations,
@@ -37,7 +33,6 @@ const compareCareers = async (req, res) => {
     if (!career1 || !career2) {
       return res.status(400).json({ error: 'Two career paths are required for comparison.' });
     }
-    // The service now returns a parsed JSON object directly
     const comparisonData = await compareCareerPaths(career1, career2);
     res.status(200).json(comparisonData);
   } catch (error) {
@@ -60,8 +55,38 @@ const suggestProject = async (req, res) => {
   }
 };
 
+const getDynamicQuiz = async (req, res) => {
+  try {
+    const { careerTitle } = req.params;
+    if (!careerTitle) {
+      return res.status(400).json({ error: 'Career title is required.' });
+    }
+    const quiz = await generateQuiz(careerTitle);
+    res.status(200).json(quiz);
+  } catch (error) {
+    console.error("Error generating quiz:", error);
+    res.status(500).json({ error: 'Failed to generate quiz.' });
+  }
+};
+
+const getQuizSuggestion = async (req, res) => {
+  try {
+    const userProfile = req.body;
+    if (!userProfile || !userProfile.interests || !userProfile.skills) {
+      return res.status(400).json({ error: 'User profile with interests and skills is required.' });
+    }
+    const topic = await suggestQuizTopic(userProfile);
+    res.status(200).json({ topic });
+  } catch (error) {
+    console.error("Error suggesting quiz topic:", error);
+    res.status(500).json({ error: 'Failed to suggest quiz topic.' });
+  }
+};
+
 module.exports = {
   generateRecommendations,
   compareCareers,
   suggestProject,
+  getDynamicQuiz,
+  getQuizSuggestion,
 };

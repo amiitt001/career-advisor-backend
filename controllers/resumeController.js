@@ -3,7 +3,7 @@ const db = require('../database.js');
 const { extractSkillsFromResume } = require('../services/resumeParser.js');
 
 const storage = new Storage();
-const bucketName = 'career-and-skills-advisor-resumes'; // Make sure this is correct
+const bucketName = 'Trial-bucket-project'; // Make sure this is correct
 const bucket = storage.bucket(bucketName);
 
 const uploadResume = async (req, res) => {
