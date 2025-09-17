@@ -1,20 +1,17 @@
-# Use the official Node.js 18 image as a base
+# 1. Use an official Node.js runtime as a parent image (Node.js 20)
 FROM node:20-slim
 
-# Set the working directory inside the container
+# 2. Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to leverage Docker cache
+# 3. Copy package files and install dependencies
+# This step is cached to speed up future builds
 COPY package*.json ./
+RUN npm ci --only=production
 
-# Install production dependencies
-RUN npm install --only=production
-
-# Copy the rest of your application code
+# 4. Copy the rest of your application's source code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 5000
-
-# The command to start the server when the container starts
-CMD [ "node", "server.js" ]
+# 5. Define the command to run your app when the container starts
+# This will run "npm start", which in turn runs "node server.js"
+CMD [ "npm", "start" ]
